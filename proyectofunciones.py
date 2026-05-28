@@ -22,6 +22,7 @@ def imprimir_opciones(lista_archivos): #definimos una funcion para imprimir opci
             print("Error, vuelva a ingresar un numero") #imprime un mensaje de error
             continue #vuelve al inicio del bucle
         else: #si no se cumple ninguna condicion
+            print(f"El archvio seleccionado es: {lista_archivos[elegir - 1]}")
             break #se acaba el bucle
     return lista_archivos[elegir-1]  #aqui decimos que devuelva el valor del numero elegido restando 1 (esto para que pueda leerlo en el orden correcto)
 
@@ -35,12 +36,20 @@ def calcular_mediana(datos_senal): #definimos una funcion para calcular la media
         ventana = datos_senal[i:i+7] #aqui le decimos que tome los datos desde que empieza hasta 7
         resultados.append(np.median(ventana)) #aqui calcula la mediana, y luego agrega los resultados a la lista resultados
     return resultados #decimos que devuelva los datos de la lista resultados
+
+def calcular_promedio_global(datos):
+    suma_total = sum(datos)
+    cantidad_datos = len(datos)
+    promedio = suma_total / cantidad_datos
+    return promedio
+
 #calcular media
 def calcular_media(datos_senal): #definimos una funcion para calcular la media
     resultados = []
     for i in range(len(datos_senal)):
         ventana = datos_senal[i:i+7]
-        resultados.append(np.mean(ventana))
+        promedio_ventana = calcular_promedio_global(ventana)
+        resultados.append(promedio_ventana)
     return resultados
 archivos_encontrados = buscar_archivos()
 archivo_elegido = imprimir_opciones(archivos_encontrados)
@@ -69,11 +78,7 @@ def mostrar_media(event):
     ax.legend()                       
     plt.draw()
 
-def calcular_promedio_global(datos):
-    suma_total = sum(datos)
-    cantidad_datos = len(datos)
-    promedio = suma_total / cantidad_datos
-    return promedio
+
 
 def calcular_desviacion_global(datos):
     promedio = calcular_promedio_global(datos)
@@ -87,22 +92,31 @@ def calcular_desviacion_global(datos):
 
 def mostrar_estadisticas(event):
     datos_actuales = linea.get_ydata()
+    maximo_actual = calcular_maximo(datos_actuales)
+    minimo_actual = calcular_minimo(datos_actuales)
     promedio_actual = calcular_promedio_global(datos_actuales)
     desviacion_actual = calcular_desviacion_global(datos_actuales)
-    texto_estadisticas = f"Promedio: {promedio_actual:.2f}\nDesv. Estándar: {desviacion_actual:.2f}"
+    texto_estadisticas = f"Promedio: {promedio_actual:.2f}\nDesv. Estándar: {desviacion_actual:.2f}\nMaximo: {maximo_actual:.2f}\nMinimo: {minimo_actual:.2f}"
     texto_box.set_text(texto_estadisticas)
     plt.draw()
 
+def calcular_minimo(datos):
+    minimo = np.min(datos)
+    return minimo
+
+def calcular_maximo(datos):
+    maximo = np.max(datos)
+    return maximo
 
 
 fig, ax = plt.subplots()
 
 linea, = ax.plot(datos_senal, label="Señal Original")
 
-
 ax.set_title("grafico señal") 
 ax.grid(True)
 ax.legend()
+plt.subplots_adjust(bottom=0.20)
 print("¡Preparando ventana del gráfico!")
 
 ax_btn1 = plt.axes([0.5, 0.02, 0.2, 0.07])
